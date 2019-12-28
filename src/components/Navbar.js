@@ -6,6 +6,7 @@ class Navbar extends React.Component {
     
     handleClick = () => {
         this.props.resetUsername()
+        this.props.resetNote()
         this.props.resetUser()
         this.props.resetNotes()
     }
@@ -25,7 +26,8 @@ const mapDispatchToProps = dispatch => {
     return { 
         resetUsername: () => dispatch({type: 'CHOOSE_USER', username: undefined}),
         resetUser: () => dispatch({type: 'SET_USER', user: undefined}),
-        resetNotes: () => dispatch({type: 'SET_NOTES', notes: undefined})
+        resetNotes: () => dispatch({type: 'SET_NOTES', notes: undefined}),
+        resetNote: () => dispatch({type: 'SET_NOTE', note: undefined})
     }
 }
 
