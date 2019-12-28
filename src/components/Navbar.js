@@ -15,7 +15,7 @@ class Navbar extends React.Component {
         return (
             <nav className="navbar navbar-light bg-light">
                 <span className="navbar-brand mb-0 h1">Flatnote</span>
-                <Link to="/newNote" className="navbar-brand mb-0 h1">New Note</Link>                        
+                <Link to="/note/new" className="navbar-brand mb-0 h1">New Note</Link>                        
                 <Link onClick={this.handleClick} to="/login" className="navbar-brand mb-0 h1">SignOut</Link>                        
             </nav>
         )

@@ -17,6 +17,7 @@ import NewNoteForm from './components/NewNoteForm'
 
 const BASE = 'http://localhost:3000'
 const USERS = `${BASE}/users`
+const TAGS = `${BASE}/tags`
 
 class App extends React.Component {
   
@@ -32,6 +33,9 @@ class App extends React.Component {
     fetch(USERS)
     .then(resp => resp.json())
     .then(users => this.props.setUserList(users))
+    fetch(TAGS)
+    .then(resp => resp.json())
+    .then(tags => this.props.setTags(tags))
   }
 
   render() {
@@ -49,13 +53,13 @@ class App extends React.Component {
               <Navbar />
               <Dashboard />
             </Route>
+            <Route path="/note/new">
+              <Navbar />
+              <NewNoteForm />
+            </Route>
             <Route path="/note/:id">
               <Navbar />
               <Dashboard />
-            </Route>
-            <Route path="/newNote">
-              <Navbar />
-              <NewNoteForm />
             </Route>
           </Switch>
         </div>
@@ -75,6 +79,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return { 
     setUserList: (userData) => dispatch({type: 'SET_USERS', users: userData}),
+    setTags: (tags) => dispatch({type: 'SET_TAGS', tags: tags}),
  }
 }
 

@@ -2,13 +2,17 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 
+const NOTES = 'http://localhost:3000/notes/'
+
 class NoteBox extends React.Component {
     state = {
         toggleChosen: false
     }
     
     pickNote = () => {
-        this.props.setNote(this.props.note)
+        fetch(NOTES + this.props.note.id)
+        .then(resp => resp.json())
+        .then(note => this.props.setNote(note))
         this.setState({toggleChosen: true})
     }
     
