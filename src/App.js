@@ -13,6 +13,7 @@ import NavbarLogin from './components/NavbarLogin'
 import Dashboard from './containers/Dashboard'
 // import { render } from '@testing-library/react';
 import { Redirect } from 'react-router-dom'
+import NewNoteForm from './components/NewNoteForm'
 
 const BASE = 'http://localhost:3000'
 const USERS = `${BASE}/users`
@@ -47,6 +48,10 @@ class App extends React.Component {
             <Route path="/dashboard">
               <Navbar />
               <Dashboard />
+            </Route>
+            <Route path="/newNote">
+              <Navbar />
+              <NewNoteForm />
             </Route>
           </Switch>
         </div>
