@@ -73,8 +73,6 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = dispatch => {
-  // map through users fetched to pass just the usernames as an array
-  // to compare later with the username used to login
   return { 
     setUserList: (userData) => dispatch({type: 'SET_USERS', users: userData}),
  }
