@@ -7,6 +7,7 @@ import NoteDetails from '../components/NoteDetails'
 
 const BASE = 'http://localhost:3000'
 const USERS = `${BASE}/users`
+const NOTES = `${BASE}/notes`
 
 class Dashboard extends React.Component {
     constructor() {
@@ -63,6 +64,14 @@ class Dashboard extends React.Component {
         })
     }
 
+    componentDidMount() {
+        if (this.props.note) {
+            fetch(`${NOTES}/${this.props.note.id}`)
+            .then(resp => resp.json())
+            .then(note => this.props.setNote(note))
+        }
+    }
+    
     conditionalDetails = () => {
         if (this.props.note) {
             return <NoteDetails />
@@ -93,6 +102,7 @@ class Dashboard extends React.Component {
 const mapDispatchToProps = dispatch => {
     return { 
       setNotes: (notes) => dispatch({type: 'SET_NOTES', notes: notes}),
+      setNote: (note) => dispatch({type: 'SET_NOTE', note: note}),
       setUser: (user) => dispatch({type: 'SET_USER', user: user})
    }
 }
