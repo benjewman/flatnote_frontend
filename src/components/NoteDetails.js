@@ -30,7 +30,11 @@ class NoteDetails extends React.Component {
     }
 
     showEdit = () => {
-        this.setState({editToggle: true})
+        this.setState({
+            editToggle: true,
+            title: this.props.note.title,
+            content: this.props.note.content
+        })
     }
     
     renderShow = () => {
@@ -65,6 +69,7 @@ class NoteDetails extends React.Component {
         .then(resp => resp.json())
         .then(note => console.log(note))
 
+        this.setState({editToggle: false})
 
     }
 
