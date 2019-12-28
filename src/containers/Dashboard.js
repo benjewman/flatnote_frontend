@@ -3,11 +3,18 @@ import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 import NoteContainer from './NoteContainer'
 import NoteBox from '../components/NoteBox'
+import NoteDetails from '../components/NoteDetails'
 
 const BASE = 'http://localhost:3000'
 const USERS = `${BASE}/users`
 
 class Dashboard extends React.Component {
+    constructor() {
+        super()
+        this.state = {
+            notes: []
+        }
+    }
     
     checkForUsers() {
         console.log('setting user')
@@ -49,15 +56,35 @@ class Dashboard extends React.Component {
             .then(user => this.props.setUser(user))
         }
     }
+
+    setNoteState = () => {
+        this.setState({
+            notes: this.props.notes
+        })
+    }
+
+    conditionalDetails = () => {
+        if (this.props.note) {
+            return <NoteDetails />
+        }
+    }
     
     render() {
         console.log(this.props)
         return (
-            <div>
-                {/* {this.renderNotes()} */}
-                {!(this.props.user) && this.props.users ? this.setOrCreateUser() : true}
-                {!this.props.notes && this.props.user ? this.fetchNotes() : true}
-                {this.props.notes ? this.renderNotes() : true}
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        {/* {this.renderNotes()} */}
+                        {!(this.props.user) && this.props.users ? this.setOrCreateUser() : true}
+                        {!this.props.notes && this.props.user ? this.fetchNotes() : true}
+                        {/* {this.props.notes && this.props.notes.length !== this.state.notes.length ? this.fetchNotes() : true} */}
+                        {this.props.notes ? this.renderNotes() : true}
+                    </div>
+                    <div class="col">
+                        {this.conditionalDetails()}
+                    </div>
+                </div>
             </div>
         )
     }
@@ -75,7 +102,8 @@ const mapStateToProps = state => {
       username: state.username, 
       users: state.users,
       user: state.user,
-      notes: state.notes
+      notes: state.notes,
+      note: state.note
     }
 }
 

@@ -33,6 +33,12 @@ export default function manageNotes(state = {
                 notes: action.notes
             }
 
+        case 'SET_NOTE':
+            return {
+                ...state,
+                note: action.note
+            }
+
         default:
             return state;
 

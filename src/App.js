@@ -49,6 +49,10 @@ class App extends React.Component {
               <Navbar />
               <Dashboard />
             </Route>
+            <Route path="/note/:id">
+              <Navbar />
+              <Dashboard />
+            </Route>
             <Route path="/newNote">
               <Navbar />
               <NewNoteForm />
