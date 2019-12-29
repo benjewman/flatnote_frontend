@@ -1,7 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-const NOTES = 'http://localhost:3000/notes/'
+const BASE = 'http://localhost:3000'
+const NOTES = `${BASE}/notes/`
+const NOTE_TAGS =`${BASE}/note_tags`
 
 class NoteDetails extends React.Component {
     constructor(props) {
@@ -22,6 +24,8 @@ class NoteDetails extends React.Component {
         fetch(NOTES + this.props.note.id, fetchObj)
         .then(resp => resp.json())
         .then(data => console.log(data))
+
+        this.props.resetNote()
     }
 
     renderTags = () => {
@@ -52,8 +56,30 @@ class NoteDetails extends React.Component {
         )
     }
 
-    handleSave = () => {
+    fetchNoteTag = (tagId, noteId) => {
+        const noteTagObj = {
+            tag_id: tagId,
+            note_id: noteId
+        }
+        const postObj = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: "POST",
+            body: JSON.stringify(noteTagObj)
+        }
+        fetch(NOTE_TAGS, postObj)
+        .then(resp => resp.json())
+        .then(noteTag => console.log(noteTag))
+    }
+    
+    handleSave = (event) => {
         // PUT fetch with state data
+        const checkboxes = Array.from(event.target.querySelectorAll('.tagbox'))
+        console.log(checkboxes)
+        const tagIds = checkboxes.filter(box => box.checked).map(box => parseInt(box.value))
+        console.log(tagIds)
         const noteUpdate = {
             title: this.state.title,
             content: this.state.content
@@ -69,6 +95,7 @@ class NoteDetails extends React.Component {
         .then(resp => resp.json())
         .then(note => console.log(note))
 
+        tagIds.forEach(tagId => this.fetchNoteTag(tagId, this.props.note.id))
         this.setState({editToggle: false})
 
     }
@@ -84,12 +111,33 @@ class NoteDetails extends React.Component {
     renderEdit = () => {
         return (
             <div>
-                Title: <input onChange={this.handleTitleChange} type="text"  value={this.state.title}/>
-                Content: <input onChange={this.handleContentChange} type="text"  value={this.state.content}/>
-                <h5>Tags</h5>
-                <button onClick={this.handleSave}>Save</button>
+                <form onSubmit={this.handleSave}>
+                    Title: <input onChange={this.handleTitleChange} type="text"  value={this.state.title}/>
+                    Content: <input onChange={this.handleContentChange} type="text"  value={this.state.content}/>
+                    <h5>Tags</h5><br/>
+                    {this.renderTagBoxes()}
+                    <button type="submit">Save</button>
+                </form>
             </div>
         )
+    }
+
+    handleCheck = (event) => {
+        event.target.checked = !event.target.checked
+    }
+
+    renderTagBoxes = () => {
+        const checkedTagIds = this.props.note.tags.map(tag => tag.id)
+        console.log(checkedTagIds)
+        return this.props.tags.map(tag => {
+            return (
+                <div>
+                    {tag.name}
+                    {/* {checkedTagIds.includes(tag.id) ? <input  onChange={this.handleUncheck} type="checkbox" class="tagbox" value={tag.id} checked /> : <input type="checkbox" class="tagbox" value={tag.id} />}  */}
+                    <input onChange={this.handleCheck} type="checkbox" class="tagbox" value={tag.id} checked={checkedTagIds.includes(tag.id)}/>
+                </div>
+            )
+        })
     }
     
     render = () => {
@@ -104,13 +152,14 @@ class NoteDetails extends React.Component {
 
 const mapStateToProps = state => {
     return { 
-      note: state.note
+      note: state.note,
+      tags: state.tags
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return { 
-        resetNote: () => dispatch({type: 'SET_NOTE', users: undefined}),
+        resetNote: () => dispatch({type: 'SET_NOTE', note: undefined}),
         setNote: (note) => dispatch({type: 'SET_NOTE', note: note})
     }
 }

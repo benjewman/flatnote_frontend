@@ -22,12 +22,12 @@ class NoteBox extends React.Component {
     
     render() {
         return (
-            <div onClick={this.pickNote} class="card">
-                <div class="card-header">
+            <div onClick={this.pickNote} className="card">
+                <div className="card-header">
                     <h3>{this.props.note.title}</h3>
                 </div>
-                <div class="card-body">
-                    <p class="card-text">{this.props.note.content}</p>
+                <div className="card-body">
+                    <p className="card-text">{this.props.note.content}</p>
                 </div>
                 {this.state.toggleChosen ? <Redirect to={this.noteLink()}/> : true}
             </div>

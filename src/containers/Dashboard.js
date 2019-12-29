@@ -81,16 +81,16 @@ class Dashboard extends React.Component {
     render() {
         console.log(this.props)
         return (
-            <div class="container">
-                <div class="row">
-                    <div class="col">
+            <div className="container">
+                <div className="row">
+                    <div className="col">
                         {/* {this.renderNotes()} */}
                         {!(this.props.user) && this.props.users ? this.setOrCreateUser() : true}
                         {!this.props.notes && this.props.user ? this.fetchNotes() : true}
                         {/* {this.props.notes && this.props.notes.length !== this.state.notes.length ? this.fetchNotes() : true} */}
                         {this.props.notes ? this.renderNotes() : true}
                     </div>
-                    <div class="col">
+                    <div className="col">
                         {this.conditionalDetails()}
                     </div>
                 </div>

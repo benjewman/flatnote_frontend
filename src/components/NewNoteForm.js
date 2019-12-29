@@ -50,8 +50,6 @@ class NewNoteForm extends React.Component {
             user_id: this.props.user.id,
             title: title,
             content: content
-            // add tag ids
-            // tagIds: checkedTagIds
         }
         
         const fetchObj = {
