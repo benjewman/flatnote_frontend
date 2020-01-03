@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 const BASE = 'http://localhost:3000'
 const NOTES = `${BASE}/notes/`
-const NOTE_TAGS =`${BASE}/note_tags`
+const NOTE_TAGS =`${BASE}/note_tags/`
 
 class NoteDetails extends React.Component {
     constructor(props) {
@@ -11,20 +11,26 @@ class NoteDetails extends React.Component {
         this.state = {
             editToggle: false,
             title: this.props.note.title,
-            content: this.props.note.content
+            content: this.props.note.content,
+            noteTags: this.props.note.tags.map(tag => tag.name)
         }
     }
     
     deleteNote = () => {
         const fetchObj = {
             method: 'DELETE',
-            headers: {'content-type': 'application/json'},
-            body: JSON.stringify(this.props.note)
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            // body: JSON.stringify(this.props.note)
         }
+
         fetch(NOTES + this.props.note.id, fetchObj)
         .then(resp => resp.json())
         .then(data => console.log(data))
 
+        this.props.removeNote(this.props.note)
         this.props.resetNote()
     }
 
@@ -42,7 +48,6 @@ class NoteDetails extends React.Component {
     }
     
     renderShow = () => {
-        console.log(this.props.note.tags)
         return (
             <div>
                 <h2>{this.props.note.title}</h2>
@@ -56,10 +61,23 @@ class NoteDetails extends React.Component {
         )
     }
 
-    fetchNoteTag = (tagId, noteId) => {
+    deleteFetchNoteTag = (noteTagId) => {
+        const postObj = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: "DELETE",
+        }
+        fetch(NOTE_TAGS + noteTagId, postObj)
+        .then(resp => resp.json())
+        .then(noteTag => console.log('destroy message', noteTag))
+    }
+
+    fetchNoteTag = (tagId) => {
         const noteTagObj = {
             tag_id: tagId,
-            note_id: noteId
+            note_id: this.props.note.id
         }
         const postObj = {
             headers: {
@@ -71,15 +89,41 @@ class NoteDetails extends React.Component {
         }
         fetch(NOTE_TAGS, postObj)
         .then(resp => resp.json())
-        .then(noteTag => console.log(noteTag))
+        .then(noteTag => console.log('NEW TAG', noteTag))
+
+        const tagToAdd = this.props.tags.find(tag => tag.id === tagId)
+        this.props.addTag(tagToAdd)
     }
     
     handleSave = (event) => {
         // PUT fetch with state data
         const checkboxes = Array.from(event.target.querySelectorAll('.tagbox'))
-        console.log(checkboxes)
-        const tagIds = checkboxes.filter(box => box.checked).map(box => parseInt(box.value))
-        console.log(tagIds)
+        const unchecked = checkboxes.filter(box => !box.checked)
+        const checked = checkboxes.filter(box => box.checked)
+        const myTagIds = this.props.note.tags.map(tag => tag.id)
+       
+        console.log('myTagIds', myTagIds)
+
+        const checkedTagIds = checked.filter(box => !myTagIds.includes(parseInt(box.value))).map(box => parseInt(box.value))
+        
+        const uncheckedTagIds = unchecked.filter(box => myTagIds.includes(parseInt(box.value))).map(box => parseInt(box.value))
+        const uncheckedNoteTagIds = uncheckedTagIds.map(id => this.props.note.note_tags.find(noteTag => noteTag.tag_id === id)).map(noteTags => noteTags.id)
+
+        checkedTagIds.forEach(tagId => this.fetchNoteTag(tagId))
+        uncheckedNoteTagIds.forEach(noteTagId => this.deleteFetchNoteTag(noteTagId))
+
+        this.putFetchNote()
+        this.fetchUserNotes()
+        this.setState({editToggle: false})
+    }
+
+    fetchUserNotes = () => {
+        fetch(`${BASE}/users/${this.props.user.id}`)
+        .then(resp => resp.json())
+        .then(user => this.props.setNotes(user.notes))
+    }
+
+    putFetchNote = () => {
         const noteUpdate = {
             title: this.state.title,
             content: this.state.content
@@ -93,11 +137,7 @@ class NoteDetails extends React.Component {
 
         fetch(NOTES + this.props.note.id, fetchObj)
         .then(resp => resp.json())
-        .then(note => console.log(note))
-
-        tagIds.forEach(tagId => this.fetchNoteTag(tagId, this.props.note.id))
-        this.setState({editToggle: false})
-
+        .then(note => this.props.setNote(note))
     }
 
     handleTitleChange = (event) => {
@@ -109,6 +149,7 @@ class NoteDetails extends React.Component {
     }
     
     renderEdit = () => {
+
         return (
             <div>
                 <form onSubmit={this.handleSave}>
@@ -123,25 +164,47 @@ class NoteDetails extends React.Component {
     }
 
     handleCheck = (event) => {
-        event.target.checked = !event.target.checked
+        // event.target.checked = !event.target.checked
+        console.log(event.target.checked)
+        if (!event.target.checked) {
+            const newNoteTags = this.state.noteTags.filter(tag => tag !== event.target.name)
+            
+            this.setState({ noteTags: newNoteTags })
+        } else {
+            const newNoteTags = this.state.noteTags
+            newNoteTags.push(event.target.name)
+            console.log('new Note Tags', newNoteTags)
+            console.log(
+                '======================='
+            )
+            this.setState({ noteTags: newNoteTags })
+        }
     }
 
     renderTagBoxes = () => {
-        const checkedTagIds = this.props.note.tags.map(tag => tag.id)
-        console.log(checkedTagIds)
+        // const checkedTagIds = this.props.note.tags.map(tag => tag.id)
+        // console.log(checkedTagIds)
+        
         return this.props.tags.map(tag => {
+            // debugger
             return (
                 <div>
                     {tag.name}
-                    {/* {checkedTagIds.includes(tag.id) ? <input  onChange={this.handleUncheck} type="checkbox" class="tagbox" value={tag.id} checked /> : <input type="checkbox" class="tagbox" value={tag.id} />}  */}
-                    <input onChange={this.handleCheck} type="checkbox" class="tagbox" value={tag.id} checked={checkedTagIds.includes(tag.id)}/>
+                    <input onChange={this.handleCheck} type="checkbox" className="tagbox" name={tag.name} value={tag.id} checked={this.state.noteTags.includes(tag.name)}/>
                 </div>
             )
         })
     }
+
+    setTagCheck = tag => {
+        this.setState({ [tag.name + 'Check']: true })
+    }
+
+    // componentWillReceiveProps(nextProps) {
+    //     this.setState({ noteTags: nextProps.note.tags.map(tag => tag.name) })
+    // }
     
     render = () => {
-        console.log(this.props.note)
         return (
             <div>
                 {this.state.editToggle ? this.renderEdit() : this.renderShow()}
@@ -153,14 +216,18 @@ class NoteDetails extends React.Component {
 const mapStateToProps = state => {
     return { 
       note: state.note,
-      tags: state.tags
+      tags: state.tags,
+      user: state.user
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return { 
         resetNote: () => dispatch({type: 'SET_NOTE', note: undefined}),
-        setNote: (note) => dispatch({type: 'SET_NOTE', note: note})
+        setNote: (note) => dispatch({type: 'SET_NOTE', note: note}),
+        removeNote: (note) => dispatch({type: 'REMOVE_NOTE', note: note}),
+        setNotes: (notes) => dispatch({type: 'SET_NOTES', notes: notes}),
+        addTag: (tag) => dispatch({type: 'ADD_TAG_TO_NOTE', tag: tag})
     }
 }
 

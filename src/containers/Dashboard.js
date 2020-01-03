@@ -18,26 +18,22 @@ class Dashboard extends React.Component {
     }
     
     checkForUsers() {
-        console.log('setting user')
         if (!(this.props.username)) {
             return <Redirect to="/login"/>
         }
     }
 
     fetchNotes = () => {
-        console.log('fetching notes', this.props)
         fetch(`${USERS}/${this.props.user.id}`)
         .then(resp => resp.json())
         .then(user => this.props.setNotes(user.notes))
     }
 
     renderNotes = () => {
-        console.log('rendering notes')
         return this.props.notes.map(note => <NoteBox note={note}/>)
     }
 
     setOrCreateUser() {
-        console.log(this.props.users)
         const usernameArray = this.props.users.map(user => user.username)
         if (usernameArray.includes(this.props.username)) {
           const chosenUser = this.props.users.find(user => user.username === this.props.username)
@@ -79,7 +75,6 @@ class Dashboard extends React.Component {
     }
     
     render() {
-        console.log(this.props)
         return (
             <div className="container">
                 <div className="row">

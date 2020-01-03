@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 class Login extends React.Component {
     state = {
-        input: ""
+        input: "ben"
     }
 
     handleChange = event => {
