@@ -12,7 +12,8 @@ class NoteDetails extends React.Component {
             editToggle: false,
             title: this.props.note.title,
             content: this.props.note.content,
-            noteTags: this.props.note.tags.map(tag => tag.name)
+            // noteTags: this.props.note.tags.map(tag => tag.name)
+            noteTags: []
         }
     }
     
@@ -167,11 +168,11 @@ class NoteDetails extends React.Component {
         // event.target.checked = !event.target.checked
         console.log(event.target.checked)
         if (!event.target.checked) {
-            const newNoteTags = this.state.noteTags.filter(tag => tag !== event.target.name)
+            const newNoteTags = this.props.note.tags.filter(tag => tag !== event.target.name)
             
             this.setState({ noteTags: newNoteTags })
         } else {
-            const newNoteTags = this.state.noteTags
+            const newNoteTags = this.props.note.tags
             newNoteTags.push(event.target.name)
             console.log('new Note Tags', newNoteTags)
             console.log(
